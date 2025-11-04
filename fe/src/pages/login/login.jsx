@@ -177,7 +177,7 @@ const Login = () => {
                 {...register("username")}
               />
               {errors.username && (
-                <div className="error-message">
+                <div className="error-message-password">
                   <p>{errors.username.message}</p>
                 </div>
               )}
