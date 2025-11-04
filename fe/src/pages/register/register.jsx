@@ -186,48 +186,67 @@ const Register = () => {
 
       {/* Form Container */}
       <Container
-        maxWidth="md"
+        maxWidth="sm"
         sx={{
           position: "relative",
           height: "100%",
           display: "flex",
           alignItems: "center",
           zIndex: 1,
+          py: 2,
         }}
       >
         <Paper
           elevation={6}
           sx={{
-            p: 4,
+            p: 2.5,
             width: "100%",
+            maxWidth: "550px",
+            margin: "0 auto",
             backgroundColor: "rgba(255, 255, 255, 0.9)",
             backdropFilter: "blur(5px)",
+            maxHeight: "95vh",
+            overflowY: "auto",
+            "&::-webkit-scrollbar": {
+              width: "6px",
+            },
+            "&::-webkit-scrollbar-track": {
+              background: "#f1f1f1",
+            },
+            "&::-webkit-scrollbar-thumb": {
+              background: "#009F85",
+              borderRadius: "3px",
+            },
           }}
         >
-          <Box sx={{ textAlign: "center", mb: 4 }}>
-            <Typography variant="subtitle1" sx={{ color: "#2E7D32" }}>
+          <Box sx={{ textAlign: "center", mb: 2 }}>
+            <Typography variant="h6" sx={{ color: "#009F85", fontWeight: "bold", fontSize: "20px" }}>
               Đăng ký tài khoản
             </Typography>
           </Box>
 
           <form onSubmit={handleSubmit(onSubmit)}>
-            <Grid container spacing={3}>
+            <Grid container spacing={1.5}>
               {/* Full Name */}
               <Grid item xs={12}>
                 <TextField
                   fullWidth
                   label="Họ và tên"
                   variant="outlined"
+                  size="small"
                   {...register("fullName")}
                   error={!!errors.fullName}
                   helperText={errors.fullName?.message}
+                  FormHelperTextProps={{
+                    sx: { fontSize: "12px", margin: "4px 0 0 0" }
+                  }}
                 />
               </Grid>
 
               {/* Gender and Birthday */}
               <Grid item xs={12} sm={6}>
-                <FormControl component="fieldset">
-                  <FormLabel component="legend" sx={{ color: "#2E7D32" }}>
+                <FormControl component="fieldset" fullWidth>
+                  <FormLabel component="legend" sx={{ color: "#009F85", fontSize: "14px", mb: 0.5 }}>
                     Giới tính
                   </FormLabel>
                   <RadioGroup row>
@@ -235,28 +254,32 @@ const Register = () => {
                       value="female"
                       control={
                         <Radio
-                          sx={{ color: "#2E7D32" }}
+                          size="small"
+                          sx={{ color: "#009F85", "&.Mui-checked": { color: "#009F85" } }}
                           {...register("gender")}
                         />
                       }
                       label="Nữ"
                       labelPlacement="end"
+                      sx={{ fontSize: "14px" }}
                     />
                     <FormControlLabel
                       value="male"
                       control={
                         <Radio
-                          sx={{ color: "#2E7D32" }}
+                          size="small"
+                          sx={{ color: "#009F85", "&.Mui-checked": { color: "#009F85" } }}
                           defaultChecked
                           {...register("gender")}
                         />
                       }
                       label="Nam"
                       labelPlacement="end"
+                      sx={{ fontSize: "14px" }}
                     />
                   </RadioGroup>
                   {errors.gender && (
-                    <Typography variant="caption" color="error">
+                    <Typography variant="caption" color="error" sx={{ fontSize: "12px", display: "block", mt: 0.5 }}>
                       {errors.gender.message}
                     </Typography>
                   )}
@@ -268,10 +291,14 @@ const Register = () => {
                   fullWidth
                   label="Ngày sinh"
                   type="date"
+                  size="small"
                   InputLabelProps={{ shrink: true }}
                   {...register("birthday")}
                   error={!!errors.birthday}
                   helperText={errors.birthday?.message}
+                  FormHelperTextProps={{
+                    sx: { fontSize: "12px", margin: "4px 0 0 0" }
+                  }}
                 />
               </Grid>
 
@@ -281,9 +308,13 @@ const Register = () => {
                   fullWidth
                   label="Email"
                   variant="outlined"
+                  size="small"
                   {...register("email")}
                   error={!!errors.email}
                   helperText={errors.email?.message}
+                  FormHelperTextProps={{
+                    sx: { fontSize: "12px", margin: "4px 0 0 0" }
+                  }}
                 />
               </Grid>
 
@@ -292,9 +323,13 @@ const Register = () => {
                   fullWidth
                   label="Số điện thoại"
                   variant="outlined"
+                  size="small"
                   {...register("numberphone")}
                   error={!!errors.numberphone}
                   helperText={errors.numberphone?.message}
+                  FormHelperTextProps={{
+                    sx: { fontSize: "12px", margin: "4px 0 0 0" }
+                  }}
                 />
               </Grid>
 
@@ -304,9 +339,13 @@ const Register = () => {
                   fullWidth
                   label="Username"
                   variant="outlined"
+                  size="small"
                   {...register("username")}
                   error={!!errors.username}
                   helperText={errors.username?.message}
+                  FormHelperTextProps={{
+                    sx: { fontSize: "12px", margin: "4px 0 0 0" }
+                  }}
                 />
               </Grid>
 
@@ -317,16 +356,21 @@ const Register = () => {
                   label="Mật khẩu"
                   type={showPassword ? "text" : "password"}
                   variant="outlined"
+                  size="small"
                   {...register("password")}
                   error={!!errors.password}
                   helperText={errors.password?.message}
+                  FormHelperTextProps={{
+                    sx: { fontSize: "12px", margin: "4px 0 0 0" }
+                  }}
                   InputProps={{
                     endAdornment: (
                       <InputAdornment position="end">
                         <IconButton
                           onClick={handleTogglePassword}
                           edge="end"
-                          sx={{ color: "#2E7D32" }}
+                          size="small"
+                          sx={{ color: "#009F85" }}
                         >
                           {showPassword ? <VisibilityOff /> : <Visibility />}
                         </IconButton>
@@ -343,16 +387,21 @@ const Register = () => {
                   label="Xác nhận mật khẩu"
                   type={showConfirmPassword ? "text" : "password"}
                   variant="outlined"
+                  size="small"
                   {...register("confirmPassword")}
                   error={!!errors.confirmPassword}
                   helperText={errors.confirmPassword?.message}
+                  FormHelperTextProps={{
+                    sx: { fontSize: "12px", margin: "4px 0 0 0" }
+                  }}
                   InputProps={{
                     endAdornment: (
                       <InputAdornment position="end">
                         <IconButton
                           onClick={handleToggleConfirmPassword}
                           edge="end"
-                          sx={{ color: "#2E7D32" }}
+                          size="small"
+                          sx={{ color: "#009F85" }}
                         >
                           {showConfirmPassword ? (
                             <VisibilityOff />
@@ -367,16 +416,18 @@ const Register = () => {
               </Grid>
 
               {/* Submit Button */}
-              <Grid item xs={12}>
+              <Grid item xs={12} sx={{ mt: 1 }}>
                 <Button
                   type="submit"
                   fullWidth
                   disabled={isSubmitting}
                   variant="contained"
                   sx={{
-                    py: 2,
-                    backgroundColor: "#2E7D32",
-                    "&:hover": { backgroundColor: "#1B5E20" },
+                    py: 1.2,
+                    fontSize: "16px",
+                    fontWeight: "bold",
+                    backgroundColor: "#009F85",
+                    "&:hover": { backgroundColor: "#007A66" },
                   }}
                 >
                   {isSubmitting ? (
@@ -388,26 +439,29 @@ const Register = () => {
               </Grid>
 
               {/* Social Login */}
-              <Grid item xs={12}>
-                <Divider sx={{ my: 2 }}>Hoặc đăng nhập bằng</Divider>
-                <Box sx={{ display: "flex", justifyContent: "center", gap: 2 }}>
+              <Grid item xs={12} sx={{ mt: 0.5 }}>
+                <Divider sx={{ my: 1.5, fontSize: "14px" }}>Hoặc đăng nhập bằng</Divider>
+                <Box sx={{ display: "flex", justifyContent: "center", gap: 1.5 }}>
                   <IconButton
+                    size="small"
                     onClick={() => alert("Đăng nhập bằng Google")}
                     sx={{ color: "#DB4437", border: "1px solid #DB4437" }}
                   >
-                    <Google />
+                    <Google fontSize="small" />
                   </IconButton>
                   <IconButton
+                    size="small"
                     onClick={() => alert("Đăng nhập bằng Facebook")}
                     sx={{ color: "#4267B2", border: "1px solid #4267B2" }}
                   >
-                    <Facebook />
+                    <Facebook fontSize="small" />
                   </IconButton>
                   <IconButton
+                    size="small"
                     onClick={() => alert("Đăng nhập bằng TikTok")}
                     sx={{ color: "#000", border: "1px solid #000" }}
                   >
-                    <FaTiktok />
+                    <FaTiktok size={16} />
                   </IconButton>
                 </Box>
               </Grid>
