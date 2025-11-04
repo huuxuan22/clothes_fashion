@@ -38,14 +38,19 @@ baseAxios.interceptors.response.use(
     (error) => {
         if (error.response) {
             const status = error.response.status;
+            const config = error.config;
+
+            // KHÔNG redirect nếu đang ở trang login hoặc đang gọi API login
+            const isLoginRequest = config?.url?.includes("/login") ||
+                window.location.pathname === "/login";
 
             // Xử lý lỗi 401 (Unauthorized) hoặc 403 (Forbidden)
-            if (status === 401 || status === 403) {
+            if ((status === 401 || status === 403) && !isLoginRequest) {
                 // Xóa token nếu có
                 localStorage.removeItem("token");
                 sessionStorage.removeItem("token");
+                localStorage.removeItem("user_principal");
 
-                // Chuyển hướng sang trang 403
                 window.location.href = "/403";
             }
         }
