@@ -1,0 +1,18 @@
+{
+    "java.compile.nullAnalysis.mode": "disabled",
+    "java.sources.organizeImports.onSave": true,
+    "workbench.colorCustomizations": {
+        "editor.background": "#1E1E1E", // nền đen sâu, giống VS Code Dark+
+        "editor.foreground": "#A9B7C6", // chữ chính xám sáng
+        "editor.lineHighlightBackground": "#2A2A2A", // highlight dòng vẫn giữ chút đen hơn để dễ phân biệt
+        "editorCursor.foreground": "#FFFFFF",
+        "editor.selectionBackground": "#264F78" // xanh dương đậm, nhìn rõ mà không chói
+    },
+    "editor.tokenColorCustomizations": {
+        "comments": "#808080", // comment xám (mờ, không nổi bật)
+        "keywords": "#CC7832", // keyword nâu cam dịu
+        "numbers": "#6897BB", // số xanh dương nhạt
+        "functions": "#A9B7C6", // hàm giữ màu chữ chính (ít màu mè)
+        "variables": "#A9B7C6" // biến giống chữ chính
+    }
+}
