@@ -35,6 +35,7 @@ import PaymentResult from "../features/PaymentResult.jsx";
 import Forbidden403 from "../pages/403/Forbidden403.jsx";
 import ForgotPassword from "../pages/forgot-password/forgot-password.jsx";
 import ResetPassword from "../pages/reset-password/reset-password.jsx";
+import AdminLogin from "../pages/admin-login/admin-login.jsx";
 
 /**
  * AppRoutes - Cấu hình tất cả các routes của ứng dụng
@@ -50,6 +51,14 @@ const AppRoutes = () => {
                 element={
                     <PublicRoute>
                         <Login />
+                    </PublicRoute>
+                }
+            />
+            <Route
+                path="/admin/login"
+                element={
+                    <PublicRoute>
+                        <AdminLogin />
                     </PublicRoute>
                 }
             />
