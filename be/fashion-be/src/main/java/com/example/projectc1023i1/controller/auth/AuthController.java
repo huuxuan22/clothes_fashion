@@ -10,6 +10,7 @@ import com.example.projectc1023i1.respone.LoginResponse;
 import com.example.projectc1023i1.respone.errorsValidate.LoginErrors;
 import com.example.projectc1023i1.respone.errorsValidate.RegisterErrors;
 import com.example.projectc1023i1.service.AuthService;
+import com.example.projectc1023i1.service.LocaleService;
 import com.example.projectc1023i1.service.RedisService;
 import com.example.projectc1023i1.mapper.ValidationErrorMapper;
 import com.example.projectc1023i1.service.VerificationService;
@@ -18,6 +19,7 @@ import com.example.projectc1023i1.utils.GetTokenFromRequest;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
+import org.springframework.context.MessageSource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -26,6 +28,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Locale;
 
 @RestController
 @AllArgsConstructor
@@ -39,6 +43,8 @@ public class AuthController {
     private final IUserService userService;
     private final VerificationService verificationService;
     private final AuthenticationManager authenticationManager;
+    private final MessageSource messageSource;
+    private final LocaleService localeService;
     
     @PostMapping("/login")
     public ResponseEntity<?> login(
@@ -59,22 +65,26 @@ public class AuthController {
             @AuthenticationPrincipal Users user,
             HttpServletRequest request
     ) {
+        Locale locale = localeService.getLocale(request);
         String token = GetTokenFromRequest.getTokenFromRequest(request);
         if (token != null) {
             String username = jwtTokenUtils.extractUserName(token);
             redisService.addTokenList(username, token);
-            return ResponseEntity.ok("Đăng xuất thành công");
+            String message = messageSource.getMessage("auth.logout.success", null, locale);
+            return ResponseEntity.ok(message);
         } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body("Không tìm thấy token hợp lệ");
+            String message = messageSource.getMessage("auth.logout.token.not.found", null, locale);
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(message);
         }
     }
     
     @PutMapping("/register")
     public ResponseEntity<?> register(
             @Valid @RequestBody UserDTO userDTO,
-            BindingResult bindingResult
+            BindingResult bindingResult,
+            HttpServletRequest request
     ) throws UserExepion {
+        Locale locale = localeService.getLocale(request);
         if (bindingResult.hasErrors()) {
             RegisterErrors registerErrors = validationErrorMapper.mapToRegisterErrors(bindingResult);
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(registerErrors);
@@ -82,37 +92,48 @@ public class AuthController {
         
         // Gửi mã xác thực và lưu UserDTO vào Redis
         verificationService.sendVerificationCode(userDTO);
-        return ResponseEntity.ok("Mã xác thực đã được gửi đến email: " + userDTO.getEmail());
+        String message = messageSource.getMessage("auth.register.verification.sent", 
+                new Object[]{userDTO.getEmail()}, locale);
+        return ResponseEntity.ok(message);
     }
     
     @PostMapping("/send-again")
-    public ResponseEntity<?> sendCodeAgain(@RequestParam String email) {
+    public ResponseEntity<?> sendCodeAgain(
+            @RequestParam String email,
+            HttpServletRequest request
+    ) {
+        Locale locale = localeService.getLocale(request);
         UserDTO userDTO = verificationService.getUserDTOFromRedis(email);
         
         if (userDTO == null) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body("Không tìm thấy dữ liệu đăng ký. Vui lòng đăng ký lại.");
+            String message = messageSource.getMessage("auth.register.data.not.found", null, locale);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(message);
         }
         
         try {
             verificationService.sendVerificationCode(userDTO);
-            return ResponseEntity.ok("Mã xác thực đã được gửi lại đến email: " + email);
+            String message = messageSource.getMessage("auth.register.send.again.success", 
+                    new Object[]{email}, locale);
+            return ResponseEntity.ok(message);
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Lỗi khi gửi lại mã xác thực: " + e.getMessage());
+            String message = messageSource.getMessage("auth.register.send.again.error", 
+                    new Object[]{e.getMessage()}, locale);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(message);
         }
     }
     
     @PostMapping("/save")
     public ResponseEntity<?> verifyCodeAndSave(
             @RequestParam String email,
-            @RequestParam String code
+            @RequestParam String code,
+            HttpServletRequest request
     ) throws UserExepion {
+        Locale locale = localeService.getLocale(request);
         UserDTO userDTO = verificationService.verifyCode(email, code);
         
         if (userDTO == null) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body("Mã xác thực không đúng hoặc đã hết hạn");
+            String message = messageSource.getMessage("auth.verify.code.invalid", null, locale);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(message);
         }
         
         Users user = userService.convertUserDTOToUser(userDTO);

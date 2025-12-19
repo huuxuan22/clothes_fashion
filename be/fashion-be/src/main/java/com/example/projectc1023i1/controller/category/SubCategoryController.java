@@ -5,6 +5,7 @@ import com.example.projectc1023i1.Dto.SubCategoryDTO;
 import com.example.projectc1023i1.Dto.get_data.category_mapstruck.CategoryMapper;
 import com.example.projectc1023i1.model.Categories;
 import com.example.projectc1023i1.model.SubCategories;
+import com.example.projectc1023i1.mapper.ValidationErrorMapper;
 import com.example.projectc1023i1.respone.errorsValidate.CategoriesErrorsRespone;
 import com.example.projectc1023i1.respone.errorsValidate.CreateSubCateErrors;
 import com.example.projectc1023i1.service.SubCategoryService;
@@ -29,28 +30,14 @@ public class SubCategoryController {
     private ISubCategoryService subCategoryService;
     @Autowired
     private ICategoriesService categoriesService;
+    @Autowired
+    private ValidationErrorMapper validationErrorMapper;
     @PostMapping("create")
     public ResponseEntity<?> createSubCategory(@Valid @RequestBody SubCategoriesDTO categoryDTO,
                                                BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
-            CreateSubCateErrors combinedErrors = new CreateSubCateErrors();
-            bindingResult.getFieldErrors().forEach(fieldError -> {
-                String errorMessage = fieldError.getDefaultMessage();
-                switch (fieldError.getField()) {
-                    case "categoriesId":
-                        combinedErrors.setCategoriesId(
-                                (combinedErrors.getCategoriesId()!= null ?
-                                        combinedErrors.getCategoriesId() + "," : "") + errorMessage);
-                        break;
-                    case "subCategoryName":
-                        combinedErrors.setSubCategoryName(
-                                (combinedErrors.getSubCategoryName() != null ?
-                                        combinedErrors.getSubCategoryName() + "," : "") + errorMessage
-                        );
-                        break;
-                }
-            });
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(combinedErrors);
+            CreateSubCateErrors errors = validationErrorMapper.mapToCreateSubCateErrors(bindingResult);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors);
         }
         SubCategories subCategories = new SubCategories();
         subCategories.setSubCategoryName(categoryDTO.getSubCategoryName());

@@ -104,56 +104,63 @@ const Register = () => {
     if (isSubmitting) return; // Nếu đang submit, không cho phép submit lại
     setIsSubmitting(true); // Đặt trạng thái là đang submit
     try {
-      console.log("đã đi vào đây");
+      console.log("Bắt đầu đăng ký với dữ liệu:", formData);
       // Lưu email để truyền sang verify-code page
       const userEmail = formData.email;
 
-      await loginService.register(formData).then((response) => {
-        if (!response.success) {
-          if (response.data.fullName) {
-            setError("fullName", {
-              type: "manual",
-              message: response.data.fullName, // Gán thông báo lỗi từ API
-            });
-          } else if (response.data.gender) {
-            setError("gender", {
-              type: "manual",
-              message: response.data.gender, // Gán thông báo lỗi từ API
-            });
-          } else if (response.data.numberphone) {
-            setError("numberphone", {
-              type: "manual",
-              message: response.data.numberphone, // Gán thông báo lỗi từ API
-            });
-          } else if (response.data.birthday) {
-            setError("birthday", {
-              type: "manual",
-              message: response.data.birthday, // Gán thông báo lỗi từ API
-            });
-          } else if (response.data.password) {
-            setError("password", {
-              type: "manual",
-              message: response.data.password, // Gán thông báo lỗi từ API
-            });
-          } else if (response.data.email) {
-            setError("email", {
-              type: "manual",
-              message: response.data.email, // Gán thông báo lỗi từ API
-            });
-          } else if (response.data.username) {
-            setError("username", {
-              type: "manual",
-              message: response.data.username, // Gán thông báo lỗi từ API
-            });
-          }
-        } else {
-          console.log("đã đi vào");
-          // Chỉ truyền email từ form data thay vì toàn bộ userDTO
-          navigate("/verify-code", { state: { email: userEmail } });
+      const response = await loginService.register(formData);
+      console.log("Response từ API:", response);
+
+      if (!response.success) {
+        console.log("Đăng ký thất bại:", response.data);
+        if (response.data.fullName) {
+          setError("fullName", {
+            type: "manual",
+            message: response.data.fullName, // Gán thông báo lỗi từ API
+          });
+        } else if (response.data.gender) {
+          setError("gender", {
+            type: "manual",
+            message: response.data.gender, // Gán thông báo lỗi từ API
+          });
+        } else if (response.data.numberphone) {
+          setError("numberphone", {
+            type: "manual",
+            message: response.data.numberphone, // Gán thông báo lỗi từ API
+          });
+        } else if (response.data.birthday) {
+          setError("birthday", {
+            type: "manual",
+            message: response.data.birthday, // Gán thông báo lỗi từ API
+          });
+        } else if (response.data.password) {
+          setError("password", {
+            type: "manual",
+            message: response.data.password, // Gán thông báo lỗi từ API
+          });
+        } else if (response.data.email) {
+          setError("email", {
+            type: "manual",
+            message: response.data.email, // Gán thông báo lỗi từ API
+          });
+        } else if (response.data.username) {
+          setError("username", {
+            type: "manual",
+            message: response.data.username, // Gán thông báo lỗi từ API
+          });
         }
-      });
+      } else {
+        console.log("Đăng ký thành công, chuyển đến trang verify-code với email:", userEmail);
+        // Chỉ truyền email từ form data thay vì toàn bộ userDTO
+        navigate("/verify-code", { state: { email: userEmail } });
+      }
     } catch (error) {
-      console.log(error);
+      console.error("Lỗi khi đăng ký:", error);
+      // Hiển thị thông báo lỗi chung nếu có lỗi không mong đợi
+      setError("email", {
+        type: "manual",
+        message: "Đã có lỗi xảy ra. Vui lòng thử lại sau.",
+      });
     } finally {
       setIsSubmitting(false);
     }

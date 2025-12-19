@@ -411,11 +411,6 @@ public class ProductController {
 
     /**
      * tim kiem san pham search trong component search
-     * @param user
-     * @param value
-     * @param page
-     * @param size
-     * @return
      */
     @GetMapping("search")
     public ResponseEntity<?> searchProductByValue(@AuthenticationPrincipal Users user,

@@ -63,7 +63,7 @@ public class AuthService {
                     .build();
             
         } catch (BadCredentialsException e) {
-            throw new BadCredentialsException("Tài khoản hoặc mật khẩu không đúng.", e);
+            throw new BadCredentialsException("Tài khoản không tồn tại hoặc mật khẩu không đúng.", e);
         }
     }
 }

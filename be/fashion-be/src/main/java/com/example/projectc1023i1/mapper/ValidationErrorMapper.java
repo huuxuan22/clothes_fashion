@@ -2,6 +2,7 @@ package com.example.projectc1023i1.mapper;
 
 import com.example.projectc1023i1.respone.errorsValidate.LoginErrors;
 import com.example.projectc1023i1.respone.errorsValidate.RegisterErrors;
+import com.example.projectc1023i1.respone.errorsValidate.CreateSubCateErrors;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
@@ -10,20 +11,15 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.BiConsumer;
 
-/**
- * Service để map validation errors từ BindingResult sang DTO errors
- * 
- * Sử dụng Strategy Pattern để tránh switch case
- * Tuân thủ Open/Closed Principle: dễ mở rộng mà không cần sửa code
- */
+
 @Component
 public class ValidationErrorMapper {
     
     private final Map<String, BiConsumer<LoginErrors, String>> loginErrorMappers;
     private final Map<String, BiConsumer<RegisterErrors, String>> registerErrorMappers;
+    private final Map<String, BiConsumer<CreateSubCateErrors, String>> createSubCateErrorMappers;
     
     public ValidationErrorMapper() {
-        // Khởi tạo Map cho LoginErrors
         this.loginErrorMappers = new HashMap<>();
         this.loginErrorMappers.put("username", (errors, message) ->
             errors.setUsername(appendMessage(errors.getUsername(), message))
@@ -32,7 +28,6 @@ public class ValidationErrorMapper {
             errors.setPassword(appendMessage(errors.getPassword(), message))
         );
 
-        // Khởi tạo Map cho RegisterErrors
         this.registerErrorMappers = new HashMap<>();
         this.registerErrorMappers.put("username", (errors, message) ->
             errors.setUsername(appendMessage(errors.getUsername(), message))
@@ -54,6 +49,14 @@ public class ValidationErrorMapper {
         );
         this.registerErrorMappers.put("birthday", (errors, message) ->
             errors.setBirthday(appendMessage(errors.getBirthday(), message))
+        );
+
+        this.createSubCateErrorMappers = new HashMap<>();
+        this.createSubCateErrorMappers.put("categoriesId", (errors, message) ->
+            errors.setCategoriesId(appendMessage(errors.getCategoriesId(), message))
+        );
+        this.createSubCateErrorMappers.put("subCategoryName", (errors, message) ->
+            errors.setSubCategoryName(appendMessage(errors.getSubCategoryName(), message))
         );
     }
     
@@ -91,6 +94,25 @@ public class ValidationErrorMapper {
         });
         
         return registerErrors;
+    }
+
+    /**
+     * Map BindingResult sang CreateSubCateErrors
+     */
+    public CreateSubCateErrors mapToCreateSubCateErrors(BindingResult bindingResult) {
+        CreateSubCateErrors subCateErrors = new CreateSubCateErrors();
+
+        bindingResult.getFieldErrors().forEach(fieldError -> {
+            String field = fieldError.getField();
+            String message = fieldError.getDefaultMessage();
+
+            BiConsumer<CreateSubCateErrors, String> mapper = createSubCateErrorMappers.get(field);
+            if (mapper != null) {
+                mapper.accept(subCateErrors, message);
+            }
+        });
+
+        return subCateErrors;
     }
     
     /**

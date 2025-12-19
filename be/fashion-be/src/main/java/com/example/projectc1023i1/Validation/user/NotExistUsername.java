@@ -12,7 +12,7 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Constraint(validatedBy = NotExistUsernameValidator.class)
 public @interface NotExistUsername {
-    String message() default "*Tai khoan nay da tồn tại";
+    String message() default "*Tài khoản Không tồn tại";
     Class<?>[] groups() default {};
     Class<? extends Payload>[] payload() default {};
 }

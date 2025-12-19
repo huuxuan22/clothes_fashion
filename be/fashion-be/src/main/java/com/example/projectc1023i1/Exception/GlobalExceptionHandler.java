@@ -19,7 +19,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(BadCredentialsException.class)
     public ResponseEntity<ErrorRespones> handleBadCredentials(BadCredentialsException e) {
         ErrorRespones error = new ErrorRespones(
-                e.getMessage() != null ? e.getMessage() : "Tài khoản hoặc mật khẩu không đúng.",
+                e.getMessage() != null ? e.getMessage() : "Tài khoản không tồn tại hoặc mật khẩu không đúng.",
                 HttpStatus.UNAUTHORIZED.value()
         );
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(error);
