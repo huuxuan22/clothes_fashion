@@ -19,11 +19,11 @@ import {
   Typography,
   Divider,
 } from "@mui/material";
-import { Visibility, VisibilityOff } from "@mui/icons-material";
+import { Visibility, VisibilityOff, ArrowBack } from "@mui/icons-material";
 import { Google, Facebook } from "@mui/icons-material";
 import { FaTiktok } from "react-icons/fa";
 import * as loginService from "./../../service/login-service";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { CircularProgress, Backdrop } from "@mui/material";
 const Register = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -230,7 +230,20 @@ const Register = () => {
             },
           }}
         >
-          <Box sx={{ textAlign: "center", mb: 2 }}>
+          <Box sx={{ textAlign: "center", mb: 2, position: "relative" }}>
+            <IconButton
+              onClick={() => navigate("/login")}
+              sx={{
+                position: "absolute",
+                left: 0,
+                top: "50%",
+                transform: "translateY(-50%)",
+                color: "#009F85",
+                "&:hover": { backgroundColor: "rgba(0, 159, 133, 0.1)" },
+              }}
+            >
+              <ArrowBack />
+            </IconButton>
             <Typography variant="h6" sx={{ color: "#009F85", fontWeight: "bold", fontSize: "20px" }}>
               Đăng ký tài khoản
             </Typography>
@@ -475,6 +488,26 @@ const Register = () => {
                     <FaTiktok size={16} />
                   </IconButton>
                 </Box>
+              </Grid>
+
+              {/* Link to Login */}
+              <Grid item xs={12} sx={{ mt: 1.5, textAlign: "center" }}>
+                <Typography variant="body2" sx={{ color: "#666", fontSize: "14px" }}>
+                  Đã có tài khoản?{" "}
+                  <Link
+                    to="/login"
+                    style={{
+                      color: "#009F85",
+                      textDecoration: "none",
+                      fontWeight: "bold",
+                      transition: "color 0.3s ease",
+                    }}
+                    onMouseEnter={(e) => (e.target.style.color = "#007A66")}
+                    onMouseLeave={(e) => (e.target.style.color = "#009F85")}
+                  >
+                    Đăng nhập ngay
+                  </Link>
+                </Typography>
               </Grid>
             </Grid>
           </form>

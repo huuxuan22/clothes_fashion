@@ -15,6 +15,7 @@ import com.example.projectc1023i1.service.RedisService;
 import com.example.projectc1023i1.mapper.ValidationErrorMapper;
 import com.example.projectc1023i1.service.VerificationService;
 import com.example.projectc1023i1.service.impl.IUserService;
+import com.example.projectc1023i1.repository.impl.IUserRepository;
 import com.example.projectc1023i1.utils.GetTokenFromRequest;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -26,10 +27,12 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Locale;
+import java.util.Optional;
 
 @RestController
 @AllArgsConstructor
@@ -45,6 +48,8 @@ public class AuthController {
     private final AuthenticationManager authenticationManager;
     private final MessageSource messageSource;
     private final LocaleService localeService;
+    private final IUserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
     
     @PostMapping("/login")
     public ResponseEntity<?> login(
@@ -119,6 +124,85 @@ public class AuthController {
             String message = messageSource.getMessage("auth.register.send.again.error", 
                     new Object[]{e.getMessage()}, locale);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(message);
+        }
+    }
+    
+    @PostMapping("/forgot-password")
+    public ResponseEntity<?> forgotPassword(
+            @RequestParam String email,
+            HttpServletRequest request
+    ) {
+        Locale locale = localeService.getLocale(request);
+        
+        // Kiểm tra email có tồn tại trong hệ thống không
+        if (!userRepository.existsByEmail(email)) {
+            String message = messageSource.getMessage("auth.forgot.password.email.not.found", 
+                    null, locale);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(message != null ? message : "Email không tồn tại trong hệ thống");
+        }
+        
+        try {
+            // Gửi mã xác thực sử dụng EmailTemplateService
+            verificationService.sendVerificationCodeForPasswordChange(email);
+            String message = messageSource.getMessage("auth.forgot.password.code.sent", 
+                    new Object[]{email}, locale);
+            return ResponseEntity.ok(message != null ? message : 
+                    "Mã xác thực đã được gửi đến email: " + email);
+        } catch (Exception e) {
+            String message = messageSource.getMessage("auth.forgot.password.error", 
+                    new Object[]{e.getMessage()}, locale);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(message != null ? message : "Lỗi khi gửi mã xác thực: " + e.getMessage());
+        }
+    }
+    
+    @PostMapping("/reset-password")
+    public ResponseEntity<?> resetPassword(
+            @RequestParam String email,
+            @RequestParam String code,
+            @RequestParam String newPassword,
+            HttpServletRequest request
+    ) {
+        Locale locale = localeService.getLocale(request);
+        
+        // Verify OTP code
+        boolean isValid = verificationService.verifyOtpCode(email, code);
+        if (!isValid) {
+            String message = messageSource.getMessage("auth.reset.password.code.invalid", 
+                    null, locale);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(message != null ? message : "Mã xác thực không đúng hoặc đã hết hạn");
+        }
+        
+        // Tìm user theo email
+        Optional<Users> userOptional = userRepository.findByEmail(email);
+        if (userOptional.isEmpty()) {
+            String message = messageSource.getMessage("auth.reset.password.user.not.found", 
+                    null, locale);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(message != null ? message : "Không tìm thấy người dùng với email này");
+        }
+        
+        try {
+            Users user = userOptional.get();
+            // Update password
+            user.setPassword(passwordEncoder.encode(newPassword));
+            userService.changePassword(user);
+            
+            // Authenticate và generate token mới
+            Authentication authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(user.getUsername(), newPassword)
+            );
+            Users updatedUser = (Users) authentication.getPrincipal();
+            String jwt = jwtTokenUtils.generateToken(updatedUser);
+            
+            return ResponseEntity.ok(jwt);
+        } catch (Exception e) {
+            String message = messageSource.getMessage("auth.reset.password.error", 
+                    new Object[]{e.getMessage()}, locale);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(message != null ? message : "Lỗi khi đặt lại mật khẩu: " + e.getMessage());
         }
     }
     

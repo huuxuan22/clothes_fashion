@@ -61,6 +61,8 @@ public class WebSercurityConfig {
                                 "/api/send",
                                 "/api/send-again",
                                 "/api/save",
+                                "/api/forgot-password",
+                                "/api/reset-password",
                                 "/api/auth/google",
                                 "/api/payment/create-payment",
                                 "/api/payment/payment_info",
