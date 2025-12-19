@@ -21,6 +21,7 @@ import org.springframework.stereotype.Component;
 import java.net.URL;
 import java.security.interfaces.RSAPublicKey;
 import java.util.List;
+import java.util.Optional;
 
 @Component
 public class GoogleJWTValidator {
@@ -100,6 +101,53 @@ public class GoogleJWTValidator {
         user.setImgUrl(picture);
         user.setRole(roleRepo.findByRoleId(2));
         return user;
+    }
+
+    /**
+     * Extract user info from Google JWT token and get or create user
+     * If user exists, return existing user; otherwise create new user
+     */
+    public Users getOrCreateUserFromGoogleToken(String jwtToken) throws Exception {
+        // Validate token first
+        if (!validateToken(jwtToken)) {
+            throw new Exception("Invalid Google token");
+        }
+
+        // Extract user info from token
+        JWTClaimsSet claims = JWTParser.parse(jwtToken).getJWTClaimsSet();
+        String googleUserId = claims.getStringClaim("sub");
+        String email = claims.getStringClaim("email");
+        String name = claims.getStringClaim("name");
+        String picture = claims.getStringClaim("picture");
+
+        System.out.println("Google User ID: " + googleUserId);
+        System.out.println("Email: " + email);
+        System.out.println("Name: " + name);
+
+        // Check if user exists by email
+        Optional<Users> existingUserOptional = userRepository.findByEmail(email);
+        if (existingUserOptional.isPresent()) {
+            Users existingUser = existingUserOptional.get();
+            // Update user info if needed
+            if (picture != null && !picture.equals(existingUser.getImgUrl())) {
+                existingUser.setImgUrl(picture);
+            }
+            if (name != null && !name.equals(existingUser.getFullName())) {
+                existingUser.setFullName(name);
+            }
+            return existingUser;
+        }
+
+        // Create new user
+        Users newUser = new Users();
+        newUser.setEmail(email);
+        newUser.setFullName(name != null ? name : email.split("@")[0]);
+        newUser.setImgUrl(picture);
+        newUser.setUsername(email); // Use email as username
+        newUser.setPassword(""); // Google users don't have password
+        newUser.setIsActive(true);
+        newUser.setRole(roleRepo.findByRoleId(2)); // Default role: USER
+        return newUser;
     }
 
 }

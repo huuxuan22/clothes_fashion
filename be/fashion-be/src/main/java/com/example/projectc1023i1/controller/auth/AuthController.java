@@ -2,11 +2,13 @@ package com.example.projectc1023i1.controller.auth;
 
 import com.example.projectc1023i1.Dto.UserDTO;
 import com.example.projectc1023i1.Exception.UserExepion;
+import com.example.projectc1023i1.component.GoogleJWTValidator;
 import com.example.projectc1023i1.component.JwtTokenUtils;
 import com.example.projectc1023i1.model.Roles;
 import com.example.projectc1023i1.model.Users;
 import com.example.projectc1023i1.request.LoginRequest;
 import com.example.projectc1023i1.respone.LoginResponse;
+import com.example.projectc1023i1.respone.UserRespone;
 import com.example.projectc1023i1.respone.errorsValidate.LoginErrors;
 import com.example.projectc1023i1.respone.errorsValidate.RegisterErrors;
 import com.example.projectc1023i1.service.AuthService;
@@ -50,6 +52,7 @@ public class AuthController {
     private final LocaleService localeService;
     private final IUserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final GoogleJWTValidator googleJWTValidator;
     
     @PostMapping("/login")
     public ResponseEntity<?> login(
@@ -231,6 +234,46 @@ public class AuthController {
         String jwt = jwtTokenUtils.generateToken(registeredUser);
         
         return ResponseEntity.ok(jwt);
+    }
+    
+    @PostMapping("/auth/google")
+    public ResponseEntity<?> googleLogin(
+            @RequestParam String idToken,
+            HttpServletRequest request
+    ) {
+        Locale locale = localeService.getLocale(request);
+        
+        try {
+            // Validate Google token and get or create user
+            Users user = googleJWTValidator.getOrCreateUserFromGoogleToken(idToken);
+            
+            // If user is new, save it to database
+            if (user.getUserId() == null) {
+                user = userService.saveUser(user);
+            } else {
+                // Update existing user if needed
+                userRepository.save(user);
+            }
+            
+            // Generate JWT token for the user
+            String jwt = jwtTokenUtils.generateToken(user);
+            
+            // Convert user to UserRespone
+            UserRespone userRespone = userService.convertUserToUserRespone(user);
+            
+            // Create LoginResponse
+            LoginResponse loginResponse = LoginResponse.builder()
+                    .token(jwt)
+                    .user(userRespone)
+                    .build();
+            
+            return ResponseEntity.ok(loginResponse);
+        } catch (Exception e) {
+            String message = messageSource.getMessage("auth.google.login.error", 
+                    new Object[]{e.getMessage()}, locale);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(message != null ? message : "Lỗi khi đăng nhập bằng Google: " + e.getMessage());
+        }
     }
 }
 
