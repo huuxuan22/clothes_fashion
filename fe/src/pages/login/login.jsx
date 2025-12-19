@@ -208,9 +208,9 @@ const Login = () => {
             <button type="submit">Đăng Nhập</button>
           </form>
           <div className="forgot-password">
-            <a href="/forgot-password" className="forgot-password-link">
+            <Link to="/forgot-password" className="forgot-password-link">
               Quên mật khẩu?
-            </a>
+            </Link>
           </div>
 
           <div className="login-3rd">

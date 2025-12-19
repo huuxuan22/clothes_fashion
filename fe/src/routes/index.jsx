@@ -33,6 +33,7 @@ import CreateCollectionPage from "../component/CreateCollection.jsx";
 import CollectionDetail from "../pages/collection-detail/CollectionDetail.jsx";
 import PaymentResult from "../features/PaymentResult.jsx";
 import Forbidden403 from "../pages/403/Forbidden403.jsx";
+import ForgotPassword from "../pages/forgot-password/forgot-password.jsx";
 
 /**
  * AppRoutes - Cấu hình tất cả các routes của ứng dụng
@@ -56,6 +57,14 @@ const AppRoutes = () => {
                 element={
                     <PublicRoute>
                         <Register />
+                    </PublicRoute>
+                }
+            />
+            <Route
+                path="/forgot-password"
+                element={
+                    <PublicRoute>
+                        <ForgotPassword />
                     </PublicRoute>
                 }
             />
