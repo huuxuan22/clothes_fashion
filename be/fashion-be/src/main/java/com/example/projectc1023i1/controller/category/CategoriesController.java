@@ -4,17 +4,20 @@ import com.example.projectc1023i1.Dto.CategoriesDTO;
 import com.example.projectc1023i1.model.Categories;
 import com.example.projectc1023i1.model.SubCategories;
 import com.example.projectc1023i1.respone.errorsValidate.CategoriesErrorsRespone;
+import com.example.projectc1023i1.service.LocaleService;
 import com.example.projectc1023i1.service.impl.ICategoriesService;
 import com.example.projectc1023i1.service.impl.ISubCategoryService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.View;
 
+import java.util.Locale;
 import java.util.List;
 import java.util.Optional;
 
@@ -27,6 +30,10 @@ public class CategoriesController {
     private View error;
     @Autowired
     private ISubCategoryService subCategoryService;
+    @Autowired
+    private MessageSource messageSource;
+    @Autowired
+    private LocaleService localeService;
 
     /**
      *
@@ -87,16 +94,22 @@ public class CategoriesController {
      *          tra ve 400 neu khong tim thay san pham
      */
     @DeleteMapping("delete/{id}")
-    public ResponseEntity<?> deleteCategories(@PathVariable Integer id) {
+    public ResponseEntity<?> deleteCategories(@PathVariable Integer id,
+                                              HttpServletRequest request) {
+        Locale locale = localeService.getLocale(request);
         if (id == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Không thấy id");
+            String message = messageSource.getMessage("category.id.not.found", null, locale);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(message);
         }
         Optional<Categories> categories = categoriesService.findById(id);
         if (categories.isPresent()) {
             categoriesService.delete(categories.get());
-            return ResponseEntity.ok("đã xóa thành công loại sản phẩm :" + categories.get().getCategoriesName());
+            String message = messageSource.getMessage("category.delete.success", 
+                    new Object[]{categories.get().getCategoriesName()}, locale);
+            return ResponseEntity.ok(message);
         }
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Không tìm thấy sản phẩm");
+        String message = messageSource.getMessage("category.product.not.found", null, locale);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(message);
     }
 
     /**
@@ -106,15 +119,19 @@ public class CategoriesController {
      *          loi 400 neu khong tim thay san pham
      */
     @GetMapping("/{id}")
-    public ResponseEntity<?> getCategories(@PathVariable Integer id) {
+    public ResponseEntity<?> getCategories(@PathVariable Integer id,
+                                           HttpServletRequest request) {
+        Locale locale = localeService.getLocale(request);
         if (id == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("không tìm thấy Id");
+            String message = messageSource.getMessage("category.id.not.found", null, locale);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(message);
         }
         Optional<Categories> categories = categoriesService.findById(id);
         if (categories.isPresent()) {
             return ResponseEntity.ok(categories.get());
         }
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("không tìm thấy loại sản phẩm ");
+        String message = messageSource.getMessage("category.not.found", null, locale);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(message);
     }
 
     /**
@@ -130,9 +147,12 @@ public class CategoriesController {
     @PatchMapping("/{id}")
     public ResponseEntity<?> updateCategories(@PathVariable Integer id,
                                               @Valid @RequestBody CategoriesDTO categoriesDTO,
-                                              BindingResult bindingResult) {
+                                              BindingResult bindingResult,
+                                              HttpServletRequest request) {
+        Locale locale = localeService.getLocale(request);
         if (id == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("id này không tồn tại");
+            String message = messageSource.getMessage("category.id.not.exist", null, locale);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(message);
         }
         if (bindingResult.hasErrors()) {
             CategoriesErrorsRespone combinedErrors = new CategoriesErrorsRespone();
