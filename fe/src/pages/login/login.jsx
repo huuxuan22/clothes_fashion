@@ -168,7 +168,7 @@ const Login = () => {
           className="background-image"
         />
         <div className="form-login">
-          <h1>PTRAN-FASHION</h1>
+          <h1>CLOTHES-FASHION</h1>
           <form onSubmit={handleSubmit(onSubmit)}>
             {/* Username Field */}
             <div className="username-field">

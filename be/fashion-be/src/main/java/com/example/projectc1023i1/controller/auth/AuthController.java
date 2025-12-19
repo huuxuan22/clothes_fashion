@@ -221,7 +221,7 @@ public class AuthController {
         }
         
         Users user = userService.convertUserDTOToUser(userDTO);
-        user.setRole(Roles.builder().roleId(1).roleName(Roles.USER).build());
+        user.setRole(Roles.builder().roleId(2).roleName(Roles.USER).build());
         userService.saveUser(user);
         
         Authentication authentication = authenticationManager.authenticate(

@@ -180,7 +180,7 @@ const SimilarProducts = ({ product }) => {
             {product.productName}
           </Typography>
           <Typography variant="caption" color="text.secondary">
-            {product.brand || "ptran-fashion"}
+            {product.brand || "CLOTHES-FASHION"}
           </Typography>
           <Box sx={{ display: "flex", alignItems: "center", mt: 1 }}>
             <Typography
