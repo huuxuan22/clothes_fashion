@@ -1,6 +1,7 @@
 import { Routes, Route } from "react-router-dom";
 import ProtectedRoute from "./ProtectedRoute";
 import PublicRoute from "./PublicRoute";
+import AdminProtectedRoute from "./AdminProtectedRoute";
 
 // Pages
 import Login from "../pages/login/login.jsx";
@@ -160,9 +161,9 @@ const AppRoutes = () => {
             <Route
                 path="/admin"
                 element={
-                    <ProtectedRoute>
+                    <AdminProtectedRoute>
                         <SideBarAdmin />
-                    </ProtectedRoute>
+                    </AdminProtectedRoute>
                 }
             />
 

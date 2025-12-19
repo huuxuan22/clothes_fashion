@@ -115,7 +115,7 @@ const ResetPassword = () => {
                     className="background-image"
                 />
                 <div className="form-reset-password">
-                    <h1>PTRAN-FASHION</h1>
+                    <h1>CLOTHES-FASHION</h1>
                     <p>Đặt lại mật khẩu mới</p>
                     <form onSubmit={handleSubmit(onSubmit)}>
                         <input

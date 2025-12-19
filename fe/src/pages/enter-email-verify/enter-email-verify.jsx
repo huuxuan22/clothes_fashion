@@ -30,7 +30,7 @@ const EnterEmailVerify = () => {
         className="background-image"
       />
       <div className="form-enter-email-verify">
-        <h1>PTRAN-FASHION</h1>
+        <h1>CLOTHES-FASHION</h1>
         <p>Fill email for verify code</p>
         <div>
           <form onSubmit={handleSubmit(onSubmit)}>

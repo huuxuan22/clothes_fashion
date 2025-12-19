@@ -105,7 +105,7 @@ const ChangePassword = () => {
         >
           <FontAwesomeIcon icon={faArrowLeft} /> Come back
         </Link>
-        <h1>PTRAN-FASHION</h1>
+        <h1>CLOTHES-FASHION</h1>
         <div className="col-lg-6">
           <div className="col-lg-6">
             <div className="password-standards">

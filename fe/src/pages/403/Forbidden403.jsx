@@ -1,14 +1,16 @@
 import React from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { Box, Typography, Button, Container } from "@mui/material";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 
 const Forbidden403 = () => {
     const navigate = useNavigate();
+    const [searchParams] = useSearchParams();
+    const errorMessage = searchParams.get("message");
 
-    // Màu teal (#008080 hoặc #17A2B8)
-    const tealColor = "#008080";
-    const tealLightColor = "#20B2AA";
+    // Màu của project
+    const primaryColor = "#009F85";
+    const hoverColor = "#007A66";
 
     const handleGoBack = () => {
         // Kiểm tra xem có token không
@@ -39,7 +41,7 @@ const Forbidden403 = () => {
                 <LockOutlinedIcon
                     sx={{
                         fontSize: 120,
-                        color: tealColor,
+                        color: primaryColor,
                         mb: 3,
                     }}
                 />
@@ -50,7 +52,7 @@ const Forbidden403 = () => {
                     sx={{
                         fontSize: { xs: "3rem", md: "5rem" },
                         fontWeight: "bold",
-                        color: tealColor,
+                        color: primaryColor,
                         mb: 2,
                     }}
                 >
@@ -62,7 +64,7 @@ const Forbidden403 = () => {
                     component="h2"
                     sx={{
                         mb: 2,
-                        color: tealColor,
+                        color: primaryColor,
                         fontWeight: 500,
                     }}
                 >
@@ -75,9 +77,13 @@ const Forbidden403 = () => {
                         mb: 4,
                         color: "text.secondary",
                         maxWidth: "500px",
+                        fontSize: "1.1rem",
+                        fontWeight: errorMessage ? 500 : 400,
                     }}
                 >
-                    Bạn không có quyền truy cập vào trang này. Vui lòng liên hệ quản trị viên nếu bạn cho rằng đây là lỗi.
+                    {errorMessage
+                        ? errorMessage
+                        : "Bạn không có quyền truy cập vào trang này. Vui lòng liên hệ quản trị viên nếu bạn cho rằng đây là lỗi."}
                 </Typography>
 
                 <Button
@@ -87,10 +93,10 @@ const Forbidden403 = () => {
                     sx={{
                         px: 4,
                         py: 1.5,
-                        backgroundColor: tealColor,
+                        backgroundColor: primaryColor,
                         color: "white",
                         "&:hover": {
-                            backgroundColor: tealLightColor,
+                            backgroundColor: hoverColor,
                         },
                         textTransform: "none",
                         fontWeight: 500,

@@ -87,7 +87,7 @@ const ForgotPassword = () => {
                     className="background-image"
                 />
                 <div className="form-forgot-password">
-                    <h1>PTRAN-FASHION</h1>
+                    <h1>CLOTHES-FASHION</h1>
                     <p>Nhập email để đặt lại mật khẩu</p>
                     <form onSubmit={handleSubmit(onSubmit)}>
                         <input
