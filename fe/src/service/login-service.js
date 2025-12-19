@@ -342,3 +342,73 @@ export const logOut = async (token) => {
         }
     }
 };
+
+/**
+ * Đăng nhập bằng Google
+ * @param {string} idToken - Google ID token từ Google Sign-In
+ */
+export const googleLogin = async (idToken) => {
+    try {
+        const res = await baseAxios.post(
+            `/api/auth/google`,
+            null,
+            {
+                params: {
+                    idToken: idToken
+                },
+                headers: {
+                    Authorization: undefined, // Không gửi token cho Google login
+                },
+            }
+        );
+
+        return {
+            success: true,
+            data: res.data,
+            token: res.data.token,
+            user: res.data.user
+        };
+    } catch (error) {
+        if (error.response) {
+            const status = error.response.status;
+            const errorData = error.response.data;
+
+            if (status === 400) {
+                return {
+                    success: false,
+                    errorType: 'validation',
+                    message: typeof errorData === 'string'
+                        ? errorData
+                        : errorData?.message || 'Token Google không hợp lệ',
+                    data: errorData
+                };
+            }
+
+            if (status === 500) {
+                return {
+                    success: false,
+                    errorType: 'server',
+                    message: typeof errorData === 'string'
+                        ? errorData
+                        : errorData?.message || 'Đã có lỗi xảy ra. Vui lòng thử lại sau.',
+                    data: errorData
+                };
+            }
+
+            return {
+                success: false,
+                errorType: 'unknown',
+                message: typeof errorData === 'string'
+                    ? errorData
+                    : errorData?.message || 'Đã có lỗi xảy ra. Vui lòng thử lại.',
+                data: errorData
+            };
+        } else {
+            return {
+                success: false,
+                errorType: 'network',
+                message: 'Không thể kết nối đến server. Vui lòng kiểm tra kết nối mạng.'
+            };
+        }
+    }
+};

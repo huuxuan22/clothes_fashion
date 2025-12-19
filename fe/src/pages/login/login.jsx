@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as Yup from "yup";
@@ -19,6 +19,7 @@ import * as loginService from "../../service/login-service";
 import { currentUser, setToken, setUserPrincipal } from "../../redux/User/Action";
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
+  const [isGoogleLoading, setIsGoogleLoading] = useState(false);
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
@@ -142,9 +143,98 @@ const Login = () => {
     setShowPassword(!showPassword);
   };
 
+  // Khởi tạo Google Sign-In
+  useEffect(() => {
+    const initGoogleSignIn = () => {
+      if (window.google && window.google.accounts) {
+        window.google.accounts.id.initialize({
+          client_id: "68579606375-81dniafrmf0ab2p2s7amdsaala52jo48.apps.googleusercontent.com",
+          callback: handleGoogleSignIn,
+        });
+      } else {
+        // Retry after a short delay if Google SDK hasn't loaded yet
+        setTimeout(initGoogleSignIn, 100);
+      }
+    };
+    initGoogleSignIn();
+  }, []);
+
+  // Xử lý Google Sign-In callback
+  const handleGoogleSignIn = async (response) => {
+    setIsGoogleLoading(true);
+    try {
+      // Gửi credential (ID token) lên backend
+      const loginResponse = await loginService.googleLogin(response.credential);
+
+      if (loginResponse.success) {
+        const token = loginResponse.token || loginResponse.data?.token;
+        const userPrincipal = loginResponse.user || loginResponse.data?.user;
+
+        // Lưu token vào localStorage
+        localStorage.setItem("token", token);
+        dispatch(setToken(token));
+
+        // Lưu user_principal vào localStorage và Redux
+        if (userPrincipal) {
+          localStorage.setItem("user_principal", JSON.stringify(userPrincipal));
+          dispatch(setUserPrincipal(userPrincipal));
+        } else {
+          // Fallback: Nếu không có user trong response, gọi API để lấy
+          try {
+            const userResponse = await dispatch(currentUser());
+            if (userResponse?.success && userResponse?.payload) {
+              localStorage.setItem("user_principal", JSON.stringify(userResponse.payload));
+              dispatch(setUserPrincipal(userResponse.payload));
+            }
+          } catch (userError) {
+            console.error("Error fetching user info:", userError);
+          }
+        }
+
+        toast.success("Đăng nhập bằng Google thành công!", {
+          position: "top-right",
+          autoClose: 2000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+        });
+
+        setTimeout(() => {
+          navigate("/", { replace: true });
+        }, 1500);
+      } else {
+        toast.error(loginResponse.message || "Đăng nhập bằng Google thất bại. Vui lòng thử lại.", {
+          position: "top-right",
+          autoClose: 3000,
+        });
+      }
+    } catch (error) {
+      console.error("Google login error:", error);
+      toast.error("Đã có lỗi xảy ra khi đăng nhập bằng Google. Vui lòng thử lại.", {
+        position: "top-right",
+        autoClose: 3000,
+      });
+    } finally {
+      setIsGoogleLoading(false);
+    }
+  };
+
   const handleLogin = (provider) => {
-    alert(`Bạn đã chọn đăng nhập bằng ${provider}`);
-    // Thêm logic xử lý đăng nhập tại đây
+    if (provider === "Gmail" || provider === "Google") {
+      // Trigger Google Sign-In popup
+      if (window.google && window.google.accounts) {
+        window.google.accounts.id.prompt();
+      } else {
+        toast.error("Google Sign-In chưa sẵn sàng. Vui lòng tải lại trang.", {
+          position: "top-right",
+          autoClose: 3000,
+        });
+      }
+    } else {
+      alert(`Bạn đã chọn đăng nhập bằng ${provider}`);
+      // Thêm logic xử lý đăng nhập tại đây
+    }
   };
 
   return (
@@ -218,9 +308,10 @@ const Login = () => {
               className="login-button"
               onClick={() => handleLogin("Gmail")}
               style={{ backgroundColor: "#db4437" }}
+              disabled={isGoogleLoading}
             >
               <FontAwesomeIcon icon={faGoogle} style={{ marginRight: "10px" }} />
-              Google
+              {isGoogleLoading ? "Đang đăng nhập..." : "Google"}
             </button>
 
             <button
