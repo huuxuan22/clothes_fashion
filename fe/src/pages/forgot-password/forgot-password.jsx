@@ -6,6 +6,7 @@ import { useNavigate, Link } from "react-router-dom";
 import { useState } from "react";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import * as loginService from "../../service/login-service";
 
 const ForgotPassword = () => {
     const navigate = useNavigate();
@@ -28,11 +29,19 @@ const ForgotPassword = () => {
     const onSubmit = async (data) => {
         setIsLoading(true);
         try {
-            // TODO: Gọi API gửi mã xác thực đến email
-            // Ví dụ: const response = await forgotPasswordService.sendResetCode(data.email);
+            // Gọi API gửi mã xác thực đến email
+            const response = await loginService.forgotPassword(data.email);
 
-            // Tạm thời hiển thị thông báo
-            toast.success("Mã xác thực đã được gửi đến email của bạn!", {
+            if (!response.success) {
+                toast.error(response.data || "Có lỗi xảy ra. Vui lòng thử lại sau!", {
+                    position: "top-right",
+                    autoClose: 3000,
+                });
+                return;
+            }
+
+            // Hiển thị thông báo thành công
+            toast.success(response.data || "Mã xác thực đã được gửi đến email của bạn!", {
                 position: "top-right",
                 autoClose: 3000,
             });
@@ -40,10 +49,14 @@ const ForgotPassword = () => {
             // Chuyển đến trang nhập mã xác thực
             setTimeout(() => {
                 navigate("/verify-code", {
-                    state: { email: data.email, type: "forgot-password" },
+                    state: {
+                        email: data.email,
+                        type: "forgot-password"
+                    },
                 });
             }, 2000);
         } catch (error) {
+            console.error("Forgot password error:", error);
             toast.error("Có lỗi xảy ra. Vui lòng thử lại sau!", {
                 position: "top-right",
                 autoClose: 3000,

@@ -159,12 +159,43 @@ export const sendCodeForPasswordChange = async (token) => {
                 },
             }
         );
-        return { success: true, data: res.data };
+        // Backend trả về string message khi thành công
+        return {
+            success: true,
+            data: typeof res.data === 'string' ? res.data : res.data?.message || "Mã xác thực đã được gửi đến email của bạn"
+        };
     } catch (error) {
         if (error.response) {
-            return { success: false, data: error.response.data };
+            const status = error.response.status;
+            const errorData = error.response.data;
+
+            if (status === 401) {
+                return {
+                    success: false,
+                    data: "Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại."
+                };
+            }
+
+            if (status === 429 || status === 403) {
+                return {
+                    success: false,
+                    data: typeof errorData === 'string'
+                        ? errorData
+                        : errorData?.message || "Email đã bị chặn do gửi quá nhiều yêu cầu. Vui lòng đợi 10 phút."
+                };
+            }
+
+            return {
+                success: false,
+                data: typeof errorData === 'string'
+                    ? errorData
+                    : errorData?.message || "Không thể gửi mã xác thực. Vui lòng thử lại."
+            };
         } else {
-            return { success: false, data: "Lỗi máy chủ, vui lòng thử lại!" };
+            return {
+                success: false,
+                data: "Không thể kết nối đến server. Vui lòng kiểm tra kết nối mạng."
+            };
         }
     }
 };

@@ -22,6 +22,7 @@ public interface IUserRepository extends JpaRepository<Users, Integer> {
     @Query(value = "SELECT * FROM users u WHERE u.number_phone = :number", nativeQuery = true)
     Optional<Users> findByNumberphone(@Param("number") String number);
     Boolean existsByEmail(String email);
+    Optional<Users> findByEmail(String email);
     Boolean existsByNumberphone(String numberphone);
     @Query(value = "select u from Users u")
     Page<Users> getAllUser(Pageable pageable);

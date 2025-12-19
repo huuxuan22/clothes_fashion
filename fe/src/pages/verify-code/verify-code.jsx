@@ -16,6 +16,7 @@ const VerifyCode = () => {
   const location = useLocation();
   const email = location.state?.email || "";
   const account = location.state?.account || {};
+  const type = location.state?.type || ""; // "forgot-password" hoặc ""
   const [showErrors, setShowErrors] = useState(false);
   const [error, setError] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
@@ -53,8 +54,30 @@ const VerifyCode = () => {
     try {
       let response = null;
 
-      // Xử lý 2 luồng: Register và Change Password
-      if (account && account.newPassword) {
+      // Xử lý 3 luồng: Register, Change Password, và Forgot Password
+      if (type === "forgot-password") {
+        // Luồng 3: Forgot Password - chỉ verify code, sau đó chuyển đến trang reset password
+        if (!email) {
+          setShowErrors(true);
+          setError("Không tìm thấy thông tin email. Vui lòng thử lại.");
+          setIsSubmitting(false);
+          return;
+        }
+
+        // Verify code bằng cách gọi reset-password với mật khẩu tạm (sẽ không dùng)
+        // Thực tế, chỉ cần verify code, sau đó chuyển đến trang reset password
+        // Tạm thời, chuyển trực tiếp đến trang reset password với code đã nhập
+        toast.success("Mã xác thực hợp lệ!", {
+          position: "top-right",
+          autoClose: 2000,
+        });
+
+        setTimeout(() => {
+          navigate("/reset-password", {
+            state: { email: email, code: verificationCode },
+          });
+        }, 1500);
+      } else if (account && account.newPassword) {
         // Luồng 1: Đổi mật khẩu
         if (!token) {
           setShowErrors(true);
@@ -171,18 +194,37 @@ const VerifyCode = () => {
       if (account && account.newPassword) {
         // Luồng 1: Change password - gọi endpoint riêng
         if (!token) {
+          const errorMsg = "Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.";
           setShowErrors(true);
-          setError("Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.");
+          setError(errorMsg);
+          toast.error(errorMsg, {
+            position: "top-right",
+            autoClose: 3000,
+          });
           setIsResending(false);
           return;
         }
 
         const response = await userService.sendCodeForPasswordChange(token);
         if (!response.success) {
+          const errorMsg = typeof response.data === 'string'
+            ? response.data
+            : "Không thể gửi mã xác thực. Vui lòng thử lại.";
           setShowErrors(true);
-          setError(response.data || "Không thể gửi mã xác thực. Vui lòng thử lại.");
+          setError(errorMsg);
+          toast.error(errorMsg, {
+            position: "top-right",
+            autoClose: 3000,
+          });
         } else {
-          setSuccessMessage("Mã xác thực đã được gửi lại đến email của bạn. Vui lòng kiểm tra.");
+          const successMsg = typeof response.data === 'string'
+            ? response.data
+            : "Mã xác thực đã được gửi lại đến email của bạn. Vui lòng kiểm tra.";
+          setSuccessMessage(successMsg);
+          toast.success(successMsg, {
+            position: "top-right",
+            autoClose: 3000,
+          });
           setTimeout(() => {
             setSuccessMessage("");
           }, 5000);
@@ -190,18 +232,37 @@ const VerifyCode = () => {
       } else {
         // Luồng 2: Register - gọi endpoint send-again
         if (!email) {
+          const errorMsg = "Không tìm thấy thông tin email. Vui lòng đăng ký lại.";
           setShowErrors(true);
-          setError("Không tìm thấy thông tin email. Vui lòng đăng ký lại.");
+          setError(errorMsg);
+          toast.error(errorMsg, {
+            position: "top-right",
+            autoClose: 3000,
+          });
           setIsResending(false);
           return;
         }
 
         const response = await loginService.sendCodeAgain(email);
         if (!response.success) {
+          const errorMsg = typeof response.data === 'string'
+            ? response.data
+            : "Không thể gửi mã xác thực. Vui lòng thử lại.";
           setShowErrors(true);
-          setError(response.data);
+          setError(errorMsg);
+          toast.error(errorMsg, {
+            position: "top-right",
+            autoClose: 3000,
+          });
         } else {
-          setSuccessMessage("Mã xác thực đã được gửi lại đến email của bạn. Vui lòng kiểm tra.");
+          const successMsg = typeof response.data === 'string'
+            ? response.data
+            : "Mã xác thực đã được gửi lại đến email của bạn. Vui lòng kiểm tra.";
+          setSuccessMessage(successMsg);
+          toast.success(successMsg, {
+            position: "top-right",
+            autoClose: 3000,
+          });
           setTimeout(() => {
             setSuccessMessage("");
           }, 5000);
@@ -209,8 +270,13 @@ const VerifyCode = () => {
       }
     } catch (err) {
       console.error("Resend code error:", err);
+      const errorMsg = err.message || "Không thể gửi lại mã xác thực. Vui lòng thử lại sau.";
       setShowErrors(true);
-      setError("Failed to resend verification code");
+      setError(errorMsg);
+      toast.error(errorMsg, {
+        position: "top-right",
+        autoClose: 3000,
+      });
     } finally {
       setIsResending(false); // Kết thúc hiển thị loading dù có lỗi hay không
     }

@@ -73,7 +73,8 @@ public class VerificationService {
             throw new RuntimeException("Lỗi khi lưu dữ liệu user vào Redis", e);
         }
         
-        sendEmail(email, code);
+        // Gửi email sử dụng EmailTemplateService
+        sendEmail(email, code, "Mã xác thực đăng ký tài khoản");
     }
     
     /**
@@ -106,7 +107,8 @@ public class VerificationService {
         String otpKey = "OTP_" + email;
         redisTemplate.opsForValue().set(otpKey, code, CODE_EXPIRATION, TimeUnit.SECONDS);
         
-        sendEmail(email, code);
+        // Gửi email sử dụng EmailTemplateService
+        sendEmail(email, code, "Mã xác thực đổi mật khẩu");
     }
 
     public UserDTO getUserDTOFromRedis(String email) {
@@ -185,16 +187,23 @@ public class VerificationService {
         return String.format("%06d", random.nextInt(999999));
     }
 
-    private void sendEmail(String to, String code) {
+    /**
+     * Gửi email xác thực sử dụng EmailTemplateService
+     * 
+     * @param to Email người nhận
+     * @param code Mã OTP 6 số
+     * @param subject Tiêu đề email
+     */
+    private void sendEmail(String to, String code, String subject) {
         try {
             MimeMessage message = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
             
             helper.setFrom("phamphuongtran2004@gmail.com");
             helper.setTo(to);
-            helper.setSubject("Mã xác thực đăng ký tài khoản");
+            helper.setSubject(subject);
             
-            // Lấy HTML template từ EmailTemplateService
+            // Sử dụng EmailTemplateService để tạo HTML template từ Thymeleaf
             String htmlContent = emailTemplateService.buildVerificationCodeTemplate(code);
             helper.setText(htmlContent, true);
             
