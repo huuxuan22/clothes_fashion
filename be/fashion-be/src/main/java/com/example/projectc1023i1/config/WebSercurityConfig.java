@@ -68,9 +68,40 @@ public class WebSercurityConfig {
                                 "/api/payment/payment_info",
                                 "/api/comment/**",
                                 "/api/categories/**",
+                                "/api/subcategory/**",
+                                "/api/size/**",
+                                "/api/color/**",
                                 "/image/**",
                                 "/ws/**",
-                                "/get-all-category-employee"
+                                "/get-all-category-employee",
+                                // Public product endpoints - không cần authentication
+                                "/admin/product/standOut-nam",
+                                "/admin/product/standOut-nu",
+                                "/admin/product/search",
+                                "/admin/product/totalPage",
+                                "/admin/product/top-deal",
+                                "/admin/product/category",
+                                "/admin/product/discount-product",
+                                "/admin/product/detail",
+                                "/admin/product/image",
+                                "/admin/product/same",
+                                "/admin/product/count",
+                                "/admin/product/solid",
+                                "/admin/product/select-color",
+                                "/admin/product/searchByName",
+                                // Public user endpoints - không cần authentication
+                                "/api/users/find-product",
+                                "/api/users/count-all-product",
+                                "/api/users/get-all-collection",
+                                "/api/users/collection/first",
+                                "/api/users/collection/second",
+                                // Public coupon/deal endpoints - không cần authentication để xem
+                                "/api/users/coupons",
+                                "/api/users/deals",
+                                "/api/users/get-coupon",
+                                "/api/users/get-deal",
+                                "/api/admin/coupon/get-all",
+                                "/api/admin/deal/get-all"
                         ).permitAll()
                         .anyRequest().authenticated()
                 )

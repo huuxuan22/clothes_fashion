@@ -2,13 +2,17 @@ import baseAxios from "./BaseAxios";
 
 export const getAllColor = async (token) => {
     try {
+        const headers = {
+            "Content-Type": "application/json",
+        };
+        // Chỉ thêm token nếu có
+        if (token) {
+            headers.Authorization = `Bearer ${token}`;
+        }
         const res = await baseAxios.get(
             `/api/color`,
             {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                    "Content-Type": "application/json",
-                },
+                headers: headers
             }
         );
         return { success: true, data: res.data };
@@ -23,13 +27,17 @@ export const getAllColor = async (token) => {
 
 export const getAllSize = async (token) => {
     try {
+        const headers = {
+            "Content-Type": "application/json",
+        };
+        // Chỉ thêm token nếu có
+        if (token) {
+            headers.Authorization = `Bearer ${token}`;
+        }
         const res = await baseAxios.get(
             `/api/size`,
             {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                    "Content-Type": "application/json",
-                },
+                headers: headers
             }
         );
         return { success: true, data: res.data };

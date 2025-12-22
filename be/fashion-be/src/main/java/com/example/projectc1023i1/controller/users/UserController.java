@@ -140,8 +140,8 @@ public class UserController {
                                           @RequestParam(defaultValue = "0") Integer page) throws UserExepion {
         Pageable pageable = PageRequest.of(page, size, Sort.by("startTime").descending());
         //        return ResponseEntity.ok(couponService.getCoupons());
-        Page<Deal> coupons = dealService.findAll(pageable);
-        return ResponseEntity.ok(coupons);
+        Page<Deal> deals = dealService.findAll(pageable);
+        return ResponseEntity.ok(deals);
     }
 
     @PostMapping( value = "/create-collection", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -257,7 +257,6 @@ public class UserController {
     @GetMapping("/get-deal")
     public ResponseEntity<?> getDeal(@AuthenticationPrincipal Users users,
                                        @RequestParam("productId") Integer productId) {
-//        Deal;
         List<Deal> dealList = dealService.findByProduct(productId);
         return  ResponseEntity.ok(dealList);
     }

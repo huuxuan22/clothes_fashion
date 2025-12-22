@@ -68,14 +68,22 @@ const DashboardLayout = () => {
   const token = localStorage.getItem("token");
   const navigate = useNavigate();
   const loadTopPorduct = async () => {
-    await productService.getDiscountProduct({ token: token }).then((data) => {
+    // Token là optional - có thể lấy dữ liệu mà không cần đăng nhập
+    await productService.getDiscountProduct({ token: token || null }).then((data) => {
       setTopProduct(data.data);
     });
-    await adminService.getAllCoupon(size, page, token).then((data) => {
+    // Coupon và deal là public - có thể xem mà không cần đăng nhập
+    await adminService.getAllCoupon(size, page, token || null).then((data) => {
       setCoupons(data.data);
+    }).catch((error) => {
+      console.error("Error loading coupons:", error);
+      setCoupons([]);
     });
-    await adminService.getAllDEAL(size, page, token).then((data) => {
+    await adminService.getAllDEAL(size, page, token || null).then((data) => {
       setDeals(data.data);
+    }).catch((error) => {
+      console.error("Error loading deals:", error);
+      setDeals([]);
     });
   };
   useEffect(() => {
@@ -181,7 +189,7 @@ const DashboardLayout = () => {
                 cssEase="cubic-bezier(0.645, 0.045, 0.355, 1)"
                 dotClass="slick-dots custom-dots"
               >
-                {coupons.map((coupon) => (
+                {coupons?.map((coupon) => (
                   <Box
                     key={coupon.couponId}
                     sx={{ position: "relative" }}
@@ -254,7 +262,7 @@ const DashboardLayout = () => {
                           display: "inline-block",
                         }}
                       >
-                        
+
                       </Box>
 
                       <Typography

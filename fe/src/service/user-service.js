@@ -247,16 +247,77 @@ export const updatePassword = async (token, newPassword, code) => {
     }
 };
 
+/**
+ * Lấy danh sách coupon (public API - không cần token)
+ */
+export const getAllCoupons = async (size = 5, page = 0, token = null) => {
+    try {
+        const headers = {
+            "Content-Type": "application/json",
+        };
+        // Chỉ thêm token nếu có
+        if (token) {
+            headers.Authorization = `Bearer ${token}`;
+        }
+        const res = await baseAxios.get(
+            `/api/users/coupons?size=${size}&page=${page}`,
+            {
+                headers: headers
+            }
+        );
+        return { success: true, data: res.data };
+    } catch (error) {
+        if (error.response) {
+            console.log(error.response.data);
+            return { success: false, data: error.response.data };
+        } else {
+            return { success: false, data: "Lỗi máy chủ, vui lòng thử lại!" };
+        }
+    }
+};
+
+/**
+ * Lấy danh sách deal (public API - không cần token)
+ */
+export const getAllDeals = async (size = 5, page = 0, token = null) => {
+    try {
+        const headers = {
+            "Content-Type": "application/json",
+        };
+        // Chỉ thêm token nếu có
+        if (token) {
+            headers.Authorization = `Bearer ${token}`;
+        }
+        const res = await baseAxios.get(
+            `/api/users/deals?size=${size}&page=${page}`,
+            {
+                headers: headers
+            }
+        );
+        return { success: true, data: res.data };
+    } catch (error) {
+        if (error.response) {
+            console.log(error.response.data);
+            return { success: false, data: error.response.data };
+        } else {
+            return { success: false, data: "Lỗi máy chủ, vui lòng thử lại!" };
+        }
+    }
+};
+
 export const getCoupon = async (token, code) => {
     try {
-
+        const headers = {
+            "Content-Type": "application/json",
+        };
+        // Token là optional cho API này (có thể xem chi tiết mà không cần đăng nhập)
+        if (token) {
+            headers.Authorization = `Bearer ${token}`;
+        }
         const res = await baseAxios.get(
             `/api/users/get-coupon?code=${code}`,
             {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                    "Content-Type": "application/json",
-                },
+                headers: headers
             }
         );
         return { success: true, data: res.data };
@@ -279,14 +340,17 @@ export const getCoupon = async (token, code) => {
  */
 export const getDeal = async (token, productId) => {
     try {
-
+        const headers = {
+            "Content-Type": "application/json",
+        };
+        // Token là optional cho API này (có thể xem chi tiết mà không cần đăng nhập)
+        if (token) {
+            headers.Authorization = `Bearer ${token}`;
+        }
         const res = await baseAxios.get(
             `/api/users/get-deal?productId=${productId}`,
             {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                    "Content-Type": "application/json",
-                },
+                headers: headers
             }
         );
         return { success: true, data: res.data };
