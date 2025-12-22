@@ -108,33 +108,76 @@ public class JwtTokenFilter extends OncePerRequestFilter {
             }
             
             final List<Pair<String, String >> bypassTokens = Arrays.asList(
+                    // Image endpoints - công khai
                     org.modelmapper.internal.Pair.of("/image/product/**","GET"),
                     org.modelmapper.internal.Pair.of("/image/deal/**","GET"),
                     org.modelmapper.internal.Pair.of("/image/collection/**","GET"),
                     org.modelmapper.internal.Pair.of("/image/user/**","GET"),
+                    // Category endpoints - công khai
                     org.modelmapper.internal.Pair.of("/api/categories/getAll","GET"),
                     org.modelmapper.internal.Pair.of("/api/categories","GET"),
+                    org.modelmapper.internal.Pair.of("/api/categories/**","GET"),
+                    org.modelmapper.internal.Pair.of("/api/subcategory/**","GET"),
+                    // Size và Color endpoints - công khai
+                    org.modelmapper.internal.Pair.of("/api/size","GET"),
+                    org.modelmapper.internal.Pair.of("/api/size/**","GET"),
+                    org.modelmapper.internal.Pair.of("/api/color","GET"),
+                    org.modelmapper.internal.Pair.of("/api/color/**","GET"),
+                    // Auth endpoints - công khai
                     org.modelmapper.internal.Pair.of("/api/auth/google","POST"),
-                    org.modelmapper.internal.Pair.of("/api/categories/create","POST"),
+                    org.modelmapper.internal.Pair.of("/api/login","POST"),
+                    org.modelmapper.internal.Pair.of("/api/register","PUT"),
+                    org.modelmapper.internal.Pair.of("/api/send","POST"),
+                    org.modelmapper.internal.Pair.of("/api/send-again","POST"),
+                    org.modelmapper.internal.Pair.of("/api/save","POST"),
+                    org.modelmapper.internal.Pair.of("/api/forgot-password","POST"),
+                    org.modelmapper.internal.Pair.of("/api/reset-password","POST"),
+                    // Comment endpoints - công khai
+                    org.modelmapper.internal.Pair.of("/api/comment/","GET"),
+                    org.modelmapper.internal.Pair.of("/api/comment/**","GET"),
+                    // Payment endpoints - công khai
+                    org.modelmapper.internal.Pair.of("/api/payment/create-payment","GET"),
+                    org.modelmapper.internal.Pair.of("/api/payment/payment_info","GET"),
+                    // WebSocket endpoints - công khai
+                    org.modelmapper.internal.Pair.of("/ws","GET"),
+                    org.modelmapper.internal.Pair.of("/ws/","GET"),
+                    org.modelmapper.internal.Pair.of("/ws/**","GET"),
+                    // Admin endpoints (một số công khai)
                     org.modelmapper.internal.Pair.of("/api/admin/get-all-user","GET"),
                     org.modelmapper.internal.Pair.of("/api/admin/get-infor-employee","GET"),
                     org.modelmapper.internal.Pair.of("/get-all-category-employee","GET"),
                     org.modelmapper.internal.Pair.of("/add-new-employee","POST"),
                     org.modelmapper.internal.Pair.of("/upload-image-employee","POST"),
                     org.modelmapper.internal.Pair.of("/update-employee","PUT"),
-                    org.modelmapper.internal.Pair.of("/api/login","POST"),
-                    org.modelmapper.internal.Pair.of("/api/register","PUT"),
-                    org.modelmapper.internal.Pair.of("/api/send","POST"),
-                    org.modelmapper.internal.Pair.of("/api/comment/","GET"),
-                    org.modelmapper.internal.Pair.of("/api/save","POST"),
-                    org.modelmapper.internal.Pair.of("/api/send-again","POST"),
-                    org.modelmapper.internal.Pair.of("/api/forgot-password","POST"),
-                    org.modelmapper.internal.Pair.of("/api/reset-password","POST"),
-                    org.modelmapper.internal.Pair.of("/api/payment/create-payment","GET"),
-                    org.modelmapper.internal.Pair.of("/api/payment/payment_info","GET"),
-                    org.modelmapper.internal.Pair.of("/ws","GET"),
-                    org.modelmapper.internal.Pair.of("/ws/","GET"),
-                    org.modelmapper.internal.Pair.of("/ws/**","GET")
+                    org.modelmapper.internal.Pair.of("/api/categories/create","POST"),
+                    // Public product endpoints - không cần authentication
+                    org.modelmapper.internal.Pair.of("/admin/product/standOut-nam","GET"),
+                    org.modelmapper.internal.Pair.of("/admin/product/standOut-nu","GET"),
+                    org.modelmapper.internal.Pair.of("/admin/product/search","GET"),
+                    org.modelmapper.internal.Pair.of("/admin/product/totalPage","GET"),
+                    org.modelmapper.internal.Pair.of("/admin/product/top-deal","GET"),
+                    org.modelmapper.internal.Pair.of("/admin/product/category","GET"),
+                    org.modelmapper.internal.Pair.of("/admin/product/discount-product","GET"),
+                    org.modelmapper.internal.Pair.of("/admin/product/detail","GET"),
+                    org.modelmapper.internal.Pair.of("/admin/product/image","GET"),
+                    org.modelmapper.internal.Pair.of("/admin/product/same","GET"),
+                    org.modelmapper.internal.Pair.of("/admin/product/count","GET"),
+                    org.modelmapper.internal.Pair.of("/admin/product/solid","GET"),
+                    org.modelmapper.internal.Pair.of("/admin/product/select-color","GET"),
+                    org.modelmapper.internal.Pair.of("/admin/product/searchByName","GET"),
+                    // Public user endpoints - không cần authentication
+                    org.modelmapper.internal.Pair.of("/api/users/find-product","GET"),
+                    org.modelmapper.internal.Pair.of("/api/users/count-all-product","GET"),
+                    org.modelmapper.internal.Pair.of("/api/users/get-all-collection","GET"),
+                    org.modelmapper.internal.Pair.of("/api/users/collection/first","GET"),
+                    org.modelmapper.internal.Pair.of("/api/users/collection/second","GET"),
+                    // Public coupon/deal endpoints - không cần authentication để xem
+                    org.modelmapper.internal.Pair.of("/api/users/coupons","GET"),
+                    org.modelmapper.internal.Pair.of("/api/users/deals","GET"),
+                    org.modelmapper.internal.Pair.of("/api/users/get-coupon","GET"),
+                    org.modelmapper.internal.Pair.of("/api/users/get-deal","GET"),
+                    org.modelmapper.internal.Pair.of("/api/admin/coupon/get-all","GET"),
+                    org.modelmapper.internal.Pair.of("/api/admin/deal/get-all","GET")
             );
 
             for (Pair<String, String > token : bypassTokens) {

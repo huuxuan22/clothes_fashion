@@ -149,7 +149,7 @@ const CouponManagement = () => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {coupons.map((coupon) => (
+            {coupons?.map((coupon) => (
               <TableRow
                 key={coupon.couponId}
                 hover

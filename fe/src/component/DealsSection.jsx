@@ -118,7 +118,8 @@ const DealsSection = () => {
   const loadData = async () => {
     try {
       setIsLoading(true);
-      const response = await adminService.getAllDEAL(8, 0, token);
+      // Deal là public - có thể xem mà không cần đăng nhập
+      const response = await adminService.getAllDEAL(8, 0, token || null);
       setDealList(response.data || []);
     } catch (error) {
       console.error("Error loading deals:", error);

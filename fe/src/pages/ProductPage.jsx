@@ -60,15 +60,16 @@ const ProductPage = () => {
   console.log("subcategoryId: ", subcategoryId);
 
   const loadData = async () => {
-    await categoryService.getAllCategory(token).then((data) => {
+    // Token là optional - có thể lấy dữ liệu mà không cần đăng nhập
+    await categoryService.getAllCategory(token || null).then((data) => {
       setCategories(data.data);
     });
 
-    await colorSizeService.getAllColor(token).then((data) => {
+    await colorSizeService.getAllColor(token || null).then((data) => {
       setColors(data.data);
     });
 
-    await colorSizeService.getAllSize(token).then((data) => {
+    await colorSizeService.getAllSize(token || null).then((data) => {
       setSizes(data.data);
     });
   };

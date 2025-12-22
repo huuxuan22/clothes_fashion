@@ -85,16 +85,20 @@ export const creaeDeal = async (formData, token) => {
  */
 export const getAllDEAL = async (size, page, token) => {
     try {
+        const headers = {
+            "Content-Type": "application/json",
+        };
+        // Token là optional - có thể lấy deal mà không cần đăng nhập
+        if (token) {
+            headers.Authorization = `Bearer ${token}`;
+        }
         const res = await baseAxios.get(`/api/admin/deal/get-all?size=${size}&page=${page}`, {
-            headers: {
-                "Content-Type": "multipart/form-data",
-                Authorization: `Bearer ${token}`,
-            }
+            headers: headers
         });
 
         return { success: true, data: res.data.content };
     } catch (error) {
-        console.log("Lỗi khi createChat :", error);
+        console.log("Lỗi khi getAllDEAL :", error);
         if (error.response) {
             return { success: false, data: error.response.data }
         } else {
@@ -209,16 +213,20 @@ export const createCoupon = async (formData, token) => {
 
 export const getAllCoupon = async (size, page, token) => {
     try {
+        const headers = {
+            "Content-Type": "application/json",
+        };
+        // Token là optional - có thể lấy coupon mà không cần đăng nhập
+        if (token) {
+            headers.Authorization = `Bearer ${token}`;
+        }
         const res = await baseAxios.get(`/api/admin/coupon/get-all?size=${size}&page=${page}`, {
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${token}`,
-            }
+            headers: headers
         });
 
         return { success: true, data: res.data.content };
     } catch (error) {
-        console.log("Lỗi khi createChat :", error);
+        console.log("Lỗi khi getAllCoupon :", error);
         if (error.response) {
             return { success: false, data: error.response.data }
         } else {

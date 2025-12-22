@@ -3,13 +3,17 @@ import baseAxios from "./BaseAxios"
 
 export const getAllCategory = async (token) => {
     try {
+        const headers = {
+            "Content-Type": "application/json",
+        };
+        // Chỉ thêm token nếu có
+        if (token) {
+            headers.Authorization = `Bearer ${token}`;
+        }
         const res = await baseAxios.get(
             `/api/categories/getAll`,
             {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                    "Content-Type": "application/json",
-                },
+                headers: headers
             }
         );
         return { success: true, data: res.data };
